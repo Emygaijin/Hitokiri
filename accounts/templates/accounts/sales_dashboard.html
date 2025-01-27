@@ -1,0 +1,49 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Sales {% endblock %}
+{% block content %}
+<div class="bod">
+    <h1>Welcome {{ user.surname }}  {{user.name }} </h1>
+    <div class="scrollable_container">
+        <table class="tab">
+            <thead>
+                <tr>
+                    <th>Date of Sale</th>
+                    <th>Bags Sold</th>
+                    <th>Bags Returned</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in sales_records %}
+                <tr>
+                    <td>{{ record.date_of_sale }}</td>
+                    <td>{{ record.bags_sold }}</td>
+                    <td>{{ record.bags_returned }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+    </table>
+    </div>
+
+        <a href="{% url 'add_sales_record' %}">Add Sales Record</a>
+</div>
+<script>
+    let logoutTimer;
+
+    // Function to reset the inactivity timer
+    function resetTimer() {
+        clearTimeout(logoutTimer);
+        logoutTimer = setTimeout(() => {
+            // Redirect to the logout URL after 5 minutes of inactivity
+            window.location.href = "{% url 'logout' %}";
+        }, 5 * 60 * 1000); // 5 minutes
+    }
+
+    // Events to listen for activity
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+    document.onscroll = resetTimer;
+    document.onclick = resetTimer;
+</script>
+{% endblock %}

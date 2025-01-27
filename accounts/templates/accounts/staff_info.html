@@ -1,0 +1,59 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Staff details {% endblock %}
+{% block content %}
+<div class="bod">
+    <div class="head">
+        <h1>{{ info.name|upper }} {{ info.surname|upper }}</h1>
+    </div>
+    <div class="card-holder">
+
+        <div class="image-wrap">
+            {% if info.photo %}
+            <div class="image"><img src="{{ info.photo.url }}" alt="Pending"></div>
+            {% else %}
+            <div class="image"><p>No Image selected</p></div>
+            {% endif %}
+        </div>
+        <div class="content">
+            <p>NAME: {{ info.name }} {{ info.surname }}</p>
+            <p>DATE OF BIRTH: {{ info.date_of_birth }}</p>
+            <p>ROLE: {{ info.role }}</p>
+            <p>PHONE: {{ info.phone_number }}</p>
+            <p>{{ info.email }}</p>
+            <p>DATE JOINED: {{ info.date_joined }}</p>
+            {% if info.date_disengaged is none %}
+            <p>DATE DISENGAGED: ACTIVE </p>
+            {% else %}
+            <p>DATE DISENGAGED: {{ info.date_disengaged }}</p>
+            {% endif %}
+            {% if info.cv %}
+            <p><a href="{{ info.cv.url }}" target="_blank">View CV</a></p>
+        {% else %}
+            <p>No CV uploaded.</p>
+        {% endif %}
+        </div>
+    </div>
+
+
+</div>
+<script>
+    let logoutTimer;
+
+    // Function to reset the inactivity timer
+    function resetTimer() {
+        clearTimeout(logoutTimer);
+        logoutTimer = setTimeout(() => {
+            // Redirect to the logout URL after 5 minutes of inactivity
+            window.location.href = "{% url 'logout' %}";
+        }, 5 * 60 * 1000); // 5 minutes
+    }
+
+    // Events to listen for activity
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+    document.onscroll = resetTimer;
+    document.onclick = resetTimer;
+</script>
+{% endblock %}

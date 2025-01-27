@@ -1,0 +1,13 @@
+{% extends "base.html" %}
+{% load static %}
+{% block title %} Home {% endblock %}
+{% block content %}
+<div class="hold">
+
+    <div class="keep">
+        <a href="{% url 'login' %}">Login</a> <a href="{% url 'register' %}">Register</a>
+    </div>
+
+</div>
+
+{% endblock %}

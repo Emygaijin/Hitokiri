@@ -1,0 +1,67 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Operations {% endblock %}
+{% block content %}
+<div class="bod">
+    <h2>Operations Dashboard</h2>
+    <h3>Welcome {{ user.surname }} {{ user.name }}</h3>
+
+
+<div class="scrollable_container">
+    <table class="tab">
+    <thead>
+        <tr>
+            <th>Date Produced</th>
+            <th>Bags Produced</th>
+            <th>Bags Returned</th>
+            <th>Bags Pushed to Sales</th>
+<!--            <th>Receipt</th>-->
+
+        </tr>
+    </thead>
+    <tbody>
+        {% for record in records %}
+        <tr>
+            <td>{{ record.date_produced }}</td>
+            <td>{{ record.bags_produced }}</td>
+            <td>{{ record.bags_returned }}</td>
+            <td>{{ record.bags_pushed_to_sales }}</td>
+
+<!--            <td>-->
+<!--                {% if record.receipt %}-->
+<!--                <a href="{{ record.receipt.url }}">View Receipt</a>-->
+<!--                {% else %}-->
+<!--                No Receipt-->
+<!--                {% endif %}-->
+<!--            </td>-->
+<!--            <td>{{ record.comments }}</td>-->
+        </tr>
+        {% endfor %}
+    </tbody>
+</table>
+
+    <a href="{% url 'add_bags_record' %}">Add Bags Data</a>
+</div>
+
+</div>
+<script>
+    let logoutTimer;
+
+    // Function to reset the inactivity timer
+    function resetTimer() {
+        clearTimeout(logoutTimer);
+        logoutTimer = setTimeout(() => {
+            // Redirect to the logout URL after 5 minutes of inactivity
+            window.location.href = "{% url 'logout' %}";
+        }, 5 * 60 * 1000); // 5 minutes
+    }
+
+    // Events to listen for activity
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+    document.onscroll = resetTimer;
+    document.onclick = resetTimer;
+</script>
+
+{% endblock %}

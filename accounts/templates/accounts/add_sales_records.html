@@ -1,0 +1,39 @@
+{% extends 'base.html' %}
+{% load static %}
+{% block title %} Add Sales records {% endblock %}
+{% load crispy_forms_tags %}
+{% block content %}
+
+<div class="bod">
+    <h1>Add Sales Record</h1>
+          <form method="post">
+            {% csrf_token %}
+            {{ form|crispy }}
+              <p class="warning">PLEASE ENSURE THE INFORMATION IS CORRECT BEFORE POSTING THE DATA </p>
+            <button type="submit" class="btn-success">Submit</button>
+               <a href="{% url 'sales_dashboard' %}">Back to Dashboard</a>
+          </form>
+
+</div>
+<script>
+    let logoutTimer;
+
+    // Function to reset the inactivity timer
+    function resetTimer() {
+        clearTimeout(logoutTimer);
+        logoutTimer = setTimeout(() => {
+            // Redirect to the logout URL after 5 minutes of inactivity
+            window.location.href = "{% url 'logout' %}";
+        }, 5 * 60 * 1000); // 5 minutes
+    }
+
+    // Events to listen for activity
+    window.onload = resetTimer;
+    document.onmousemove = resetTimer;
+    document.onkeypress = resetTimer;
+    document.onscroll = resetTimer;
+    document.onclick = resetTimer;
+</script>
+
+{% endblock %}
+
