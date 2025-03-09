@@ -117,3 +117,4 @@ class Finance(models.Model):
     date_of_expense = models.DateField(default=now, editable=False, blank=True, null=True)
     receipt = models.FileField(upload_to='expenses_receipts/', blank=True, null=True)
     comments = models.TextField(blank=True, max_length=2035)
+

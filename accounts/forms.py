@@ -35,3 +35,5 @@ class SalesForm(forms.ModelForm):
     class Meta:
         model = SalesRecord
         fields = ['bags_sold', 'bags_returned', 'bags_received_from_production','applied_discount', 'keystone', 'zenith', 'moniepoint', 'cash', 'comments']
+
+

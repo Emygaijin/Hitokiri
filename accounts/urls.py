@@ -13,6 +13,8 @@ from .views import (
     supervisor_dashboard,  # Import the admin dashboard view
     staff_info,
     finance_office,
+    query_records,
+    receipt_list,
 )
 
 urlpatterns = [
@@ -28,5 +30,8 @@ urlpatterns = [
     path('sales/dashboard/', sales_dashboard, name='sales_dashboard'),  # Sales dashboard
     path('sales/add/', add_sales_record, name='add_sales_record'),  # Add sales record
     path('supervisor/dashboard/', supervisor_dashboard, name='supervisor_dashboard'),  # Admin dashboard
-    path('staff_info/<str:name>', staff_info, name='staff')
+    path('staff_info/<str:name>', staff_info, name='staff'),
+    path('query/', query_records, name='query_records'),
+    path('receipts/', receipt_list, name='receipt_list'),
+
 ]

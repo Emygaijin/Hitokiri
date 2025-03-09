@@ -7,6 +7,24 @@ from django.db.models.functions import TruncDay
 from .models import OperationsRecord, CustomUser, SalesRecord, Finance
 from django.db.models import Sum, Count, Q
 from datetime import datetime, timedelta
+from django.dispatch import receiver
+from django.contrib.auth.signals import user_logged_in
+from django.contrib.sessions.models import Session
+from django.utils.timezone import now
+
+
+
+# Signal to invalidate previous sessions when a new login occurs
+@receiver(user_logged_in)
+def invalidate_previous_sessions(sender, request, user, **kwargs):
+    # Get all active sessions for the current user
+    active_sessions = Session.objects.filter(expire_date__gte=now())
+    for session in active_sessions:
+        data = session.get_decoded()
+        if data.get('_auth_user_id') == str(user.id) and session.session_key != request.session.session_key:
+            # Delete previous sessions
+            session.delete()
+
 
 
 # Landing page (Main page)
@@ -100,14 +118,42 @@ def add_expense_record(request):
     return render(request, 'accounts/add_expense.html', {'form': form})
 
 
-
-@login_required()
+@login_required
 def finance_office(request):
     operations_records = OperationsRecord.objects.all().order_by('-date_produced')[:5]
     sales_records = SalesRecord.objects.all().order_by('-date_of_sale')[:5]
+
     finance_records = Finance.objects.all()
 
-    return render(request, 'accounts/finance.html', {'operations_records':operations_records, 'sales_records':sales_records,'finance_records':finance_records})
+    # Default values for start_date and end_date
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
+
+    if start_date and end_date:
+        try:
+            # Convert string dates to datetime objects
+            start_date_obj = datetime.strptime(start_date, "%Y-%m-%d").date()
+            end_date_obj = datetime.strptime(end_date, "%Y-%m-%d").date()
+
+            # Filter expenses by date range
+            finance_records = Finance.objects.filter(date_of_expense__range=[start_date_obj, end_date_obj])
+
+        except ValueError:
+            # If there's an invalid date format, reset to default empty values
+            start_date = ''
+            end_date = ''
+
+    # Calculate total expenses
+    total_expenses = finance_records.aggregate(Sum('amount'))['amount__sum'] or 0
+
+    return render(request, 'accounts/finance.html', {
+        'operations_records': operations_records,
+        'sales_records': sales_records,
+        'finance_records': finance_records,
+        'total_expenses': total_expenses,
+        'start_date': start_date,  # Pass as string
+        'end_date': end_date  # Pass as string
+    })
 
 
 
@@ -201,7 +247,7 @@ def supervisor_dashboard(request):
     sales_comments = SalesRecord.objects.all().order_by('-comments')[:5]
 
     # Calculate average sales
-    days = SalesRecord.objects.all().order_by('-date_of_sale').count()
+    days = SalesRecord.objects.all().order_by('-date_of_sale').count() or 1
     average_sales = total_sales/days
 
 
@@ -267,3 +313,37 @@ def staff_info(request, name):
     return render(request, 'accounts/staff_info.html', {'info': info})
 
 
+@login_required
+def query_records(request):
+    start_date = request.GET.get('start_date', '')
+    end_date = request.GET.get('end_date', '')
+
+    total_sales = 0
+    total_expenses = 0
+    total_production = 0
+
+    if start_date and end_date:
+        start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
+        end_date = datetime.strptime(end_date, '%Y-%m-%d').date()
+
+        # Calculate total sum over the selected period
+        total_sales = SalesRecord.objects.filter(date_of_sale__range=[start_date, end_date]).aggregate(Sum('total'))['total__sum'] or 0
+        total_expenses = Finance.objects.filter(date_of_expense__range=[start_date, end_date]).aggregate(Sum('amount'))['amount__sum'] or 0
+        total_production = OperationsRecord.objects.filter(date_produced__range=[start_date, end_date]).aggregate(Sum('bags_produced'))['bags_produced__sum'] or 0
+    else:
+        start_date = end_date = None  # Avoid rendering "None to None" issue
+
+    context = {
+        'total_sales': total_sales,
+        'total_expenses': total_expenses,
+        'total_production': total_production,
+        'start_date': start_date,
+        'end_date': end_date,
+    }
+    return render(request, 'accounts/query_records.html', context)
+
+
+@login_required
+def receipt_list(request):
+    receipts = Finance.objects.exclude(receipt='')  # Fetch only records with receipts
+    return render(request, 'accounts/receipts.html', {'receipts': receipts})

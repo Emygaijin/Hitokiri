@@ -7,6 +7,7 @@
 
 
 <div class="bod">
+    <h3>Please ensure to change the default password on the form to a password you will remember</h3>
     <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form|crispy }}

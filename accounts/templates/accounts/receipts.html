@@ -1,10 +1,41 @@
-<!DOCTYPE html>
-<html lang="en">
-<head>
-  <meta charset="UTF-8">
-  <title>$Title$</title>
-</head>
-<body>
-$END$
-</body>
-</html>
+{% extends 'base.html' %}
+{% load static %}
+{% block content %}
+
+<div class="bod">
+<h2>Receipts</h2>
+
+    <div class="scrollable-container">
+        <table border="1">
+            <thead>
+                <tr>
+                    <th>Date</th>
+                    <th>Expense Title</th>
+                    <th>Amount</th>
+                    <th>Receipt</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for receipt in receipts %}
+                <tr>
+                    <td>{{ receipt.date_of_expense }}</td>
+                    <td>{{ receipt.expense_title }}</td>
+                    <td>₦{{ receipt.amount }}</td>
+                    <td>
+                        {% if receipt.receipt %}
+                            <a href="{{ receipt.receipt.url }}" target="_blank">View Receipt</a>
+                        {% else %}
+                            No Receipt
+                        {% endif %}
+                    </td>
+                </tr>
+                {% empty %}
+                <tr>
+                    <td colspan="4">No receipts available</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+{% endblock %}

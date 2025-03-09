@@ -11,14 +11,15 @@
     <div class="stat">
         <table>
             <p>Total Staff: {{ total_staff }}</p>
-        <p>Total Sales (Bags Sold): {{ total_sales }}</p>
-        <p>Total Bags Produced: {{ total_bags_produced }}</p>
-        <p>Total Sales: {{ grand_total }}</p>
-        <p>Total expenses: {{ total_expenses }}</p>
-        <p>Net: {{ net }}</p>
-           <p>Average Daily sales: {{ average_sales }}</p>
+            <p>Total Sales (Bags Sold): {{ total_sales }}</p>
+            <p>Total Bags Produced: {{ total_bags_produced }}</p>
+            <p>Total Sales: {{ grand_total }}</p>
+            <p>Total expenses: {{ total_expenses }}</p>
+            <p>Net: {{ net }}</p>
+            <p>Average Daily sales: {{ average_sales }}</p>
+            <p>Filter records by date range:</p>
+            <a href="{% url 'query_records' %}" class="btn">Go to Query Page</a>
         </table>
-
     </div>
 
     <!-- Graph Section -->
@@ -257,7 +258,9 @@
                 </table>
                 {% endif %}
                  {% endfor %}
+
              </div>
+             <a href="{% url 'receipt_list' %}" class="btn btn-primary">View Receipts</a>
             <div class="staff_list">
                 <h3>STAFF LIST</h3>
                 {% for data in staff_info %}
