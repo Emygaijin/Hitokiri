@@ -15,12 +15,14 @@ from .views import (
     finance_office,
     query_records,
     receipt_list,
+    auto_logout,
 )
 
 urlpatterns = [
     path('', landing_page, name='landing_page'),  # Main landing page
     path('register/', register, name='register'),  # User registration
     path('login/', custom_login, name='login'),  # User login
+    path('logout/', auto_logout, name='logout'),
     path('logout/', LogoutView.as_view(next_page='landing_page'), name='logout'),
     path('dashboard/', dashboard, name='dashboard'),  # General user dashboard
     path('operations/', operations_dashboard, name='operations_dashboard'),  # Operations manager dashboard

@@ -1,5 +1,5 @@
 from django.shortcuts import render, redirect, get_object_or_404
-from django.contrib.auth import authenticate, login
+from django.contrib.auth import authenticate, login,logout
 from django.contrib.auth.decorators import login_required
 from .forms import RegistrationForm, BagsForm, ExpenseForm, SalesForm
 from django.db.models.functions import TruncDate
@@ -30,6 +30,11 @@ def invalidate_previous_sessions(sender, request, user, **kwargs):
 # Landing page (Main page)
 def landing_page(request):
     return render(request, 'accounts/landing_page.html')
+
+
+def auto_logout(request):
+    logout(request)
+    return redirect('login')
 
 
 # Registration view

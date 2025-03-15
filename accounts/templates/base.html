@@ -22,6 +22,20 @@
  {% endif %}
 {% block content %}
 {% endblock %}
+<script>
+    let timeout = 300000;  // 5 minutes in milliseconds (300 * 1000)
+    let logoutUrl = "{% url 'logout' %}";  // Ensure 'logout' is correctly defined in urls.py
 
+    let timer = setTimeout(() => {
+        window.location.href = logoutUrl;
+    }, timeout);
+
+    document.onmousemove = document.onkeypress = () => {
+        clearTimeout(timer);
+        timer = setTimeout(() => {
+            window.location.href = logoutUrl;
+        }, timeout);
+    };
+</script>
 </body>
 </html>
