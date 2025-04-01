@@ -6,7 +6,6 @@
 <div class="bod">
       <h1>Welcome {{ user.username }}</h1>
 
-
     <!-- Summary Section -->
     <div class="stat">
         <table>
@@ -28,111 +27,107 @@
             <h4>Bank Contributions</h4>
             <canvas id="bankGraph"></canvas>
         </div>
-
-    </div>
-
-
-
-    <div class="records">
-    <h3>Latest Operations Records</h3>
-        <div class="scrollable-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date Produced</th>
-                        <th>Bags Produced</th>
-                        <th>To Sales</th>
-                        <th>Returned</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for record in operations_records %}
-                    <tr>
-                        <td>{{ record.date_produced }}</td>
-                        <td>{{ record.bags_produced }}</td>
-                        <td>{{ record.bags_pushed_to_sales }}</td>
-                        <td>{{ record.bags_returned }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="2">No operations records available.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
     </div>
 
     <!-- Sales Record -->
-        <div>
-            <h3>Latest Sales Records</h3>
-            <div class="scrollable-container">
-                <table>
-                    <thead>
-                        <tr>
-                            <th>Date of Sale</th>
-                            <th>From Production</th>
-                            <th>Discount</th>
-                            <th>Bags Sold</th>
-                            <th>Returned</th>
-                            <th>Keystone</th>
-                            <th>Moniepoint</th>
-                            <th>Zenith</th>
-                            <th>Cash</th>
-                            <th>Total</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {% for record in sales_records %}
-                        <tr>
-                            <td>{{ record.date_of_sale }}</td>
-                            <td>{{ record.bags_received_from_production }}</td>
-                            <td>{{ record.applied_discount }}</td>
-                            <td>{{ record.bags_sold }}</td>
-                            <td>{{ record.bags_returned }}</td>
-                            <td>{{ record.keystone}}</td>
-                            <td>{{ record.moniepoint }}</td>
-                            <td>{{ record.zenith }}</td>
-                            <td>{{ record.cash }} </td>
-                            <td>{{ record.total }} </td>
+       <div>
 
+    <div class="scrollable-container">
+        <table>
+            <thead>
+            <tr><h3>Latest Sales Records</h3></tr>
+                <tr>
+                    <th>Date of Sale</th>
+                    <th>From Production</th>
+                    <th>Discount</th>
+                    <th>Bags Sold</th>
+                    <th>Returned</th>
+                    <th>Keystone</th>
+                    <th>Moniepoint</th>
+                    <th>Zenith</th>
+                    <th>Cash</th>
+                    <th>Total</th>
+                    <th>Discrepancy</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for record in sales_records %}
+                {% if record.expected_total != record.total %}
+                <tr style="background-color: red; color: white; font-weight: bold;">
+                    <td>{{ record.date_of_sale }}</td>
+                    <td>{{ record.bags_received_from_production }}</td>
+                    <td>{{ record.applied_discount }}</td>
+                    <td>{{ record.bags_sold }}</td>
+                    <td>{{ record.bags_returned }}</td>
+                    <td>{{ record.keystone}}</td>
+                    <td>{{ record.moniepoint }}</td>
+                    <td>{{ record.zenith }}</td>
+                    <td>{{ record.cash }} </td>
+                   <td style="background-color: red; color: white; font-weight: bold;">
+                    {{ record.total }}
+                    </td>
+                    <td >
+                    <h4>CHECK</h4>
+                    </td>
+                </tr>
 
-                        </tr>
-                        {% empty %}
-                        <tr>
-                            <td colspan="2">No sales records available.</td>
-                        </tr>
-                        {% endfor %}
-                    </tbody>
-                </table>
-            </div>
-            <h3>Latest Expenses Records</h3>
-        <div class="scrollable-container">
-            <table>
-                <thead>
-                    <tr>
-                        <th>Date</th>
-                        <th>Title</th>
-                        <th>amount</th>
+                <tr>
+                    <td colspan="11">No sales records available.</td>
+                </tr>
+                {% else %}
+                   <tr>
+                    <td>{{ record.date_of_sale }}</td>
+                    <td>{{ record.bags_received_from_production }}</td>
+                    <td>{{ record.applied_discount }}</td>
+                    <td>{{ record.bags_sold }}</td>
+                    <td>{{ record.bags_returned }}</td>
+                    <td>{{ record.keystone}}</td>
+                    <td>{{ record.moniepoint }}</td>
+                    <td>{{ record.zenith }}</td>
+                    <td>{{ record.cash }} </td>
+                   <td>
+                    {{ record.total }}
+                    </td>
+                    <td>
+                    <h4>NONE</h4>
+                    </td>
+                </tr>
+                {% endif %}
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
 
-                    </tr>
-                </thead>
-                <tbody>
-                    {% for record in finance_records %}
-                    <tr>
-                        <td>{{ record.date_of_expense }}</td>
-                        <td>{{ record.expense_title }}</td>
-                        <td>{{ record.amount }}</td>
-                    </tr>
-                    {% empty %}
-                    <tr>
-                        <td colspan="2">No Expenses records available.</td>
-                    </tr>
-                    {% endfor %}
-                </tbody>
-            </table>
-        </div>
-            <div class="scrollable-container">
+<h3>Latest Expenses Records</h3>
+<div class="scrollable-container">
+    <table>
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Title</th>
+                <th>Amount</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in finance_records %}
+            <tr>
+                <td>{{ record.date_of_expense }}</td>
+                <td>{{ record.expense_title }}</td>
+                <td>{{ record.amount }}</td>
+            </tr>
+            {% empty %}
+            <tr>
+                <td colspan="3">No Expenses records available.</td>
+            </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+</div>
+
+<a href="{% url 'receipt_list' %}" class="btn btn-primary">View Receipts</a>
+
+     <div class="scrollable-container">
                 <h2>Finance comments</h2>
                 {% for record in finance_records %}
                 {% if record.comments %}
@@ -240,108 +235,53 @@
 
                     </tbody>
                 </table>
-                {% else %}
-                <table>
-
-                    <thead>
-                        <tr>
-                            <th>Date</th>
-                            <th>Comment</th>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="2">No Comments available.</td>
-                        </tr>
-
-                    </tbody>
-                </table>
-                {% endif %}
+                 {% endif %}
                  {% endfor %}
-
-             </div>
-             <a href="{% url 'receipt_list' %}" class="btn btn-primary">View Receipts</a>
-            <div class="staff_list">
-                <h3>STAFF LIST</h3>
-                {% for data in staff_info %}
-                <p><a href="{% url 'staff' data.name %}">{{ data.name }}</a> {{ data.surname }} | ROLE: {{ data.role }}</p>
-                {% endfor %}
-            </div>
-    </div>
-
-
-
+                 </div>
+<div class="staff_list">
+    <h3>STAFF LIST</h3>
+    {% for data in staff_info %}
+    <p>
+        {% if data.name %}
+            <a href="{% url 'staff' data.name %}">{{ data.name }} </a> {{ data.surname }}/ Role: {{ data.role }}
+        {% else %}
+            <p>Admin</p>
+        {% endif %}
+    </p>
+    {% endfor %}
+</div>
 
 </div>
 
+<!-- Include Chart.js -->
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    const bankData = {
+        labels: ['Keystone', 'Zenith', 'Moniepoint'],
+        datasets: [{
+            label: 'Bank Contributions',
+            data: [{{ total_keystone }}, {{ total_zenith }}, {{ total_moniepoint }}],
+            backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
+        }]
+    };
+    const bankConfig = {
+        type: 'bar',
+        data: bankData
+    };
+    new Chart(document.getElementById('bankGraph'), bankConfig);
 
-
-    <!-- Include Chart.js -->
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <script>
-        // Bank Graph - Pie Chart
-        const bankData = {
-            labels: ['Keystone', 'Zenith', 'Moniepoint'],
-            datasets: [{
-                label: 'Bank Contributions',
-                data: [{{ total_keystone }}, {{ total_zenith }}, {{ total_moniepoint }}],
-                backgroundColor: ['#FF6384', '#36A2EB', '#FFCE56']
-            }]
-        };
-        const bankConfig = {
-            type: 'bar',
-            data: bankData
-        };
-        new Chart(document.getElementById('bankGraph'), bankConfig);
-
-        // Sales Graph - Line Chart (Last 30 Days)
-        const salesData = {
-            labels: [{% for date in sales_dates %}'{{ date|date:"m/d/Y" }}'{% if not forloop.last %}, {% endif %}{% endfor %}],
-            datasets: [{
-                label: 'Bags Sold',
-                data: [{% for sales in sales_values %}{{ sales }}{% if not forloop.last %}, {% endif %}{% endfor %}],
-                borderColor: '#4CAF50',
-                backgroundColor: 'rgba(76, 175, 80, 0.1)',
-                fill: true,
-                tension: 0.4
-            }]
-        };
-        const salesConfig = {
-            type: 'line',
-            data: salesData,
-            options: {
-                scales: {
-                    x: {
-                        title: {
-                            display: true,
-                            text: 'Date'
-                        }
-                    },
-                    y: {
-                        title: {
-                            display: true,
-                            text: 'Bags Sold'
-                        }
-                    }
-                }
-            }
-        };
-        new Chart(document.getElementById('salesGraph'), salesConfig);
-
-         // Function to reset the inactivity timer
+    // Function to reset the inactivity timer
     function resetTimer() {
         clearTimeout(logoutTimer);
         logoutTimer = setTimeout(() => {
-            // Redirect to the logout URL after 5 minutes of inactivity
             window.location.href = "{% url 'logout' %}";
-        }, 5 * 60 * 1000); // 5 minutes
+        }, 5 * 60 * 1000);
     }
 
-    // Events to listen for activity
     window.onload = resetTimer;
     document.onmousemove = resetTimer;
     document.onkeypress = resetTimer;
     document.onscroll = resetTimer;
     document.onclick = resetTimer;
-    </script>
+</script>
 {% endblock %}

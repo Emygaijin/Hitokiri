@@ -5,7 +5,7 @@ from .forms import RegistrationForm, BagsForm, ExpenseForm, SalesForm
 from django.db.models.functions import TruncDate
 from django.db.models.functions import TruncDay
 from .models import OperationsRecord, CustomUser, SalesRecord, Finance
-from django.db.models import Sum, Count, Q
+from django.db.models import Sum, Count, Q, F
 from datetime import datetime, timedelta
 from django.dispatch import receiver
 from django.contrib.auth.signals import user_logged_in
@@ -126,7 +126,8 @@ def add_expense_record(request):
 @login_required
 def finance_office(request):
     operations_records = OperationsRecord.objects.all().order_by('-date_produced')[:5]
-    sales_records = SalesRecord.objects.all().order_by('-date_of_sale')[:5]
+    sales_records = SalesRecord.objects.all().order_by('-date_of_sale')[:5].annotate(
+        expected_total=F('bags_sold') * 400)
 
     finance_records = Finance.objects.all()
 
@@ -151,11 +152,31 @@ def finance_office(request):
     # Calculate total expenses
     total_expenses = finance_records.aggregate(Sum('amount'))['amount__sum'] or 0
 
+    # Discrepancy check (Daily Calculation)
+    latest_sale_date = SalesRecord.objects.order_by('-date_of_sale').values_list('date_of_sale', flat=True).first()
+    latest_bags_sold = 0
+    latest_total = 0
+    expected = 0
+    discrepancy_alert = None
+
+    if latest_sale_date:
+        latest_bags_sold = SalesRecord.objects.filter(date_of_sale=latest_sale_date).aggregate(Sum('bags_sold'))[
+                               'bags_sold__sum'] or 0
+        latest_total = SalesRecord.objects.filter(date_of_sale=latest_sale_date).aggregate(Sum('total'))[
+                           'total__sum'] or 0
+        expected = latest_bags_sold * 400
+
+        if expected != latest_total:
+            discrepancy_alert = f"Discrepancy detected for {latest_sale_date}: Expected {expected}, but got {latest_total}. Please review."
+
+
+
     return render(request, 'accounts/finance.html', {
         'operations_records': operations_records,
         'sales_records': sales_records,
         'finance_records': finance_records,
         'total_expenses': total_expenses,
+        'expected':expected,
         'start_date': start_date,  # Pass as string
         'end_date': end_date  # Pass as string
     })
@@ -195,19 +216,15 @@ def supervisor_dashboard(request):
     total_staff = CustomUser.objects.count()
     finance_records = Finance.objects.all().order_by('-date_of_expense')[:5]
 
-
-
     # Total sales
-
     total_sales = SalesRecord.objects.aggregate(total_bags_sold=Sum('bags_sold'))['total_bags_sold'] or 0
-
     grand_total = SalesRecord.objects.aggregate(total_cash=Sum('total'))['total_cash'] or 0
 
     # Total operations (e.g., bags produced)
     total_bags_produced = OperationsRecord.objects.aggregate(total_bags=Sum('bags_produced'))['total_bags'] or 0
     total_expenses = Finance.objects.aggregate(all_expenses=Sum('amount'))['all_expenses'] or 0
 
-    #Calculate net
+    # Calculate net
     net = grand_total - total_expenses
 
     # Staff information
@@ -221,7 +238,6 @@ def supervisor_dashboard(request):
     min_bags_sold = request.GET.get('min_bags_sold')
     max_bags_sold = request.GET.get('max_bags_sold')
 
-
     # Calculate default start date (30 days ago)
     default_start_date = datetime.now() - timedelta(days=30)
     start_date = start_date or default_start_date.strftime('%Y-%m-%d')
@@ -229,9 +245,6 @@ def supervisor_dashboard(request):
     # Filter records
     operations_filter = Q()
     sales_filter = Q()
-
-
-
 
     if start_date and end_date:
         operations_filter &= Q(date_produced__range=[start_date, end_date])
@@ -246,20 +259,14 @@ def supervisor_dashboard(request):
         sales_filter &= Q(bags_sold__lte=max_bags_sold)
 
     operations_records = OperationsRecord.objects.all().order_by('-date_produced')[:5]
-    sales_records = SalesRecord.objects.all().order_by('-date_of_sale')[:5]
+    sales_records = SalesRecord.objects.all().order_by('-date_of_sale')[:5].annotate(expected_total=F('bags_sold') * 400)
     operations_comments = OperationsRecord.objects.all().order_by('-comments')[:5]
     finance_comments = Finance.objects.all().order_by('-comments')[:5]
     sales_comments = SalesRecord.objects.all().order_by('-comments')[:5]
 
     # Calculate average sales
     days = SalesRecord.objects.all().order_by('-date_of_sale').count() or 1
-    average_sales = total_sales/days
-
-
-
-
-
-
+    average_sales = total_sales / days
 
     # Bank Graph Data
     bank_totals = SalesRecord.objects.aggregate(
@@ -276,8 +283,22 @@ def supervisor_dashboard(request):
         ]
     }
 
-    # Additional Totals
+    # Discrepancy check (Daily Calculation)
+    latest_sale_date = SalesRecord.objects.order_by('-date_of_sale').values_list('date_of_sale', flat=True).first()
+    latest_bags_sold = 0
+    latest_total = 0
+    expected = 0
+    discrepancy_alert = None
 
+    if latest_sale_date:
+        latest_bags_sold = SalesRecord.objects.filter(date_of_sale=latest_sale_date).aggregate(Sum('bags_sold'))['bags_sold__sum'] or 0
+        latest_total = SalesRecord.objects.filter(date_of_sale=latest_sale_date).aggregate(Sum('total'))['total__sum'] or 0
+        expected = latest_bags_sold * 400
+
+        if expected != latest_total:
+            discrepancy_alert = f"Discrepancy detected for {latest_sale_date}: Expected {expected}, but got {latest_total}. Please review."
+
+    # Additional Totals
     total_keystone = bank_totals['total_keystone'] or 0
     total_zenith = bank_totals['total_zenith'] or 0
     total_moniepoint = bank_totals['total_moniepoint'] or 0
@@ -299,17 +320,20 @@ def supervisor_dashboard(request):
         'total_bags_received': total_bags_received,
         'total_expenses': total_expenses,
         'grand_total': grand_total,
-        'net':net,
-        'finance_records':finance_records,
-        'finance_comments':finance_comments,
-        'sales_comments':sales_comments,
-        'operations_comments':operations_comments,
-        'average_sales':average_sales,
-
-
+        'net': net,
+        'finance_records': finance_records,
+        'finance_comments': finance_comments,
+        'sales_comments': sales_comments,
+        'operations_comments': operations_comments,
+        'average_sales': average_sales,
+        'expected': expected,
+        'latest_bags_sold': latest_bags_sold,
+        'latest_total': latest_total,
+        'discrepancy_alert': discrepancy_alert,
     }
 
     return render(request, 'accounts/supervisor_dashboard.html', context)
+
 
 
 @login_required()

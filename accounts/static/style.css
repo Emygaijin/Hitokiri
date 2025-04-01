@@ -105,6 +105,7 @@ body {
 
 /* Scrollable Container */
 .scrollable-container {
+    margin-top: 20px;
     max-height: 200px;
     overflow-y: auto;
     border: 1px solid #ddd;
@@ -155,6 +156,11 @@ body {
 .stat {
     text-align: right;
     padding-right: 10%;
+}
+
+.staff_list p{
+    font-size:30px;
+    font-weight:300;
 }
 
 /* Graphs */

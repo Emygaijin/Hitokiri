@@ -63,10 +63,30 @@
                         <th>Zenith</th>
                         <th>Cash</th>
                         <th>Total</th>
+                        <th>Discrepancy</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for record in sales_records %}
+                    {% if record.expected_total != record.total %}
+                    <tr style="background-color: red; color: white; font-weight: bold;">
+                        <td>{{ record.date_of_sale }}</td>
+                        <td>{{ record.bags_received_from_production }}</td>
+                        <td>{{ record.applied_discount }}</td>
+                        <td>{{ record.bags_sold }}</td>
+                        <td>{{ record.bags_returned }}</td>
+                        <td>{{ record.keystone}}</td>
+                        <td>{{ record.moniepoint }}</td>
+                        <td>{{ record.zenith }}</td>
+                        <td>{{ record.cash }} </td>
+                        <td>{{ record.total }} </td>
+                        <td style="background-color: red; color: white; font-weight: bold;">
+                        {{ record.total }}
+                        </td>
+                        <td >
+                        <h4>CHECK</h4>
+                    </tr>
+                    {% else %}
                     <tr>
                         <td>{{ record.date_of_sale }}</td>
                         <td>{{ record.bags_received_from_production }}</td>
@@ -78,8 +98,13 @@
                         <td>{{ record.zenith }}</td>
                         <td>{{ record.cash }} </td>
                         <td>{{ record.total }} </td>
+                        <td>
+                        {{ record.total }}
+                        </td>
+                        <td>
+                        <h4>OKAY</h4>
                     </tr>
-                    {% empty %}
+                    {% endif %}
                     <tr>
                         <td colspan="10">No sales records available.</td>
                     </tr>
