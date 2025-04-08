@@ -224,6 +224,24 @@ def supervisor_dashboard(request):
     total_bags_produced = OperationsRecord.objects.aggregate(total_bags=Sum('bags_produced'))['total_bags'] or 0
     total_expenses = Finance.objects.aggregate(all_expenses=Sum('amount'))['all_expenses'] or 0
 
+    # Total stereo
+    total_stereo = OperationsRecord.objects.aggregate(all_stereo=Sum('stereo_received'))['all_stereo'] or 0
+    total_bad_stereo = OperationsRecord.objects.aggregate(bad=Sum('bad_stereo'))['bad'] or 0
+    total_used_stereo = OperationsRecord.objects.aggregate(used=Sum('stereo_used'))['used'] or 0
+
+    available_stereo = total_stereo - total_bad_stereo - total_used_stereo
+
+    # Packaging bags
+    total_packaging_bags = OperationsRecord.objects.aggregate(received=Sum('packaging_bags'))['received'] or 0
+    total_packaging_bags_used = OperationsRecord.objects.aggregate(used=Sum('packaging_bags_used'))['used'] or 0
+
+    available_packaging_bags = total_packaging_bags - total_packaging_bags_used
+
+    lower_stereo_limit = 80.0
+
+    lower_packaging_bags_limit = 4000
+
+
     # Calculate net
     net = grand_total - total_expenses
 
@@ -321,6 +339,15 @@ def supervisor_dashboard(request):
         'total_expenses': total_expenses,
         'grand_total': grand_total,
         'net': net,
+        'lower_stereo_limit':lower_stereo_limit,
+        'lower_packaging_bags_limit':lower_packaging_bags_limit,
+        'total_stereo':total_stereo,
+        'total_bad_stereo':total_bad_stereo,
+        'total_used_stereo':total_used_stereo,
+        'available_stereo':available_stereo,
+        'total_packaging_bags':total_packaging_bags,
+        'total_packaging_bags_used':total_packaging_bags_used,
+        'available_packaging_bags':available_packaging_bags,
         'finance_records': finance_records,
         'finance_comments': finance_comments,
         'sales_comments': sales_comments,

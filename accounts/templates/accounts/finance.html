@@ -6,10 +6,10 @@
 <div class="bod">
     <h1>Welcome {{ user.username }}</h1>
 
-    <a href="{% url 'add_expense_record' %}">Add Expenses</a>
-     <h3>Query Records</h3>
-            <p>Filter records by date range:</p>
-            <a href="{% url 'query_records' %}" class="btn">Go to Query Page</a>
+    <a href="{% url 'add_expense_record' %}" style="font-weight:bold;">Add Expenses</a>
+
+            <a href="{% url 'query_records' %}" class="btn" style="font-weight:bold;">Go to Query Page</a>
+
 
 
 
@@ -150,6 +150,32 @@
             </table>
         </div>
     </div>
+    <div class="scrollable-container">
+                <h2>Sales comments</h2>
+                 {% for record in sales_records %}
+                {% if record.comments %}
+                <table>
+
+                    <thead>
+                        <tr>
+                            <th>Date</th>
+                            <th>Comment</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+
+                        <tr>
+                            <td>{{ record.date_of_sale }}</td>
+                            <td>{{ record.comments }}</td>
+
+                        </tr>
+
+
+                    </tbody>
+                </table>
+                 {% endif %}
+                 {% endfor %}
+                 </div>
 </div>
 
 <script>

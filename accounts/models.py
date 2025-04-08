@@ -70,6 +70,11 @@ class OperationsRecord(models.Model):
     date_produced = models.DateField(default=now, editable=False, blank=True, null=True)
     bags_returned = models.PositiveIntegerField(default=0, blank=True, null=True)
     bags_pushed_to_sales = models.PositiveIntegerField(default=0, blank=True,null=True)
+    stereo_received = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
+    stereo_used = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
+    packaging_bags = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
+    packaging_bags_used = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
+    bad_stereo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
     comments = models.TextField(blank=True, max_length=2035)
 
 

@@ -9,10 +9,10 @@
     <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
     {{ form|crispy }}
-        <h3 class="warning">PLEASE ENSURE THE INFORMATION IS CORRECT BEFORE POSTING THE DATA </h3>
+        <h3 class="warning" style="font-weight:bold;">PLEASE ENSURE THE INFORMATION IS CORRECT BEFORE POSTING THE DATA </h3>
     <button type="submit" class="btn-success">Submit</button>
     </form>
-    <a href="{% url 'operations_dashboard' %}">Back to Dashboard</a>
+    <a href="{% url 'operations_dashboard' %}" style="color:red; font-weight:bold;" >Back to Dashboard</a>
 </div>
 <script>
     let logoutTimer;

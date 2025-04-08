@@ -20,7 +20,8 @@ class RegistrationForm(forms.ModelForm):
 class BagsForm(forms.ModelForm):
     class Meta:
         model = OperationsRecord
-        fields = ['bags_produced', 'bags_returned', 'bags_pushed_to_sales','comments']
+        fields = ['bags_produced', 'bags_returned', 'bags_pushed_to_sales', 'stereo_received', 'bad_stereo', 'stereo_used',
+                  'packaging_bags', 'packaging_bags_used','comments']
 
 
 

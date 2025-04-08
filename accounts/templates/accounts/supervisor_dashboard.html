@@ -7,19 +7,33 @@
       <h1>Welcome {{ user.username }}</h1>
 
     <!-- Summary Section -->
-    <div class="stat">
-        <table>
-            <p>Total Staff: {{ total_staff }}</p>
-            <p>Total Sales (Bags Sold): {{ total_sales }}</p>
-            <p>Total Bags Produced: {{ total_bags_produced }}</p>
-            <p>Total Sales: {{ grand_total }}</p>
-            <p>Total expenses: {{ total_expenses }}</p>
-            <p>Net: {{ net }}</p>
-            <p>Average Daily sales: {{ average_sales }}</p>
-            <p>Filter records by date range:</p>
-            <a href="{% url 'query_records' %}" class="btn">Go to Query Page</a>
-        </table>
-    </div>
+<div class="stat">
+    <table>
+
+        <p style="font-weight:bold;">Total Staff: {{ total_staff }}</p>
+        <p style="font-weight:bold;">Total Sales (Bags Sold): {{ total_sales }}</p>
+        <p style="font-weight:bold;">Total Bags Produced: {{ total_bags_produced }}</p>
+        <p style="font-weight:bold;">Total Sales: {{ grand_total }}</p>
+        <p style="font-weight:bold;">Total expenses: {{ total_expenses }}</p>
+        <p style="font-weight:bold;">Net: {{ net }}</p>
+        <p style="font-weight:bold;">Average Daily sales: {{ average_sales }}</p>
+
+        {% if available_stereo < lower_stereo_limit %}
+            <p style="background-color:red; color:white; font-weight:bold;">Restock stereo {{ available_stereo }}Kg remaining</p>
+        {% else %}
+            <p style="font-weight:bold;">Available stereo: {{ available_stereo }}Kg</p>
+        {% endif %}
+
+        {% if available_packaging_bags < lower_packaging_bags_limit %}
+            <p style="background-color:red; color:white; font-weight:bold;">Restock packaging bags {{ available_packaging_bags }} remaining</p>
+        {% else %}
+            <p>Available packaging bags: {{ available_packaging_bags }}</p>
+        {% endif %}
+
+        <p ><a href="{% url 'query_records' %}" class="btn" style="font-weight:bold;">Go to Query Page</a></p>
+    </table>
+</div>
+
 
     <!-- Graph Section -->
     <div class="graph">
@@ -241,9 +255,9 @@
 <div class="staff_list">
     <h3>STAFF LIST</h3>
     {% for data in staff_info %}
-    <p>
+    <p style="font-weight:bold;">
         {% if data.name %}
-            <a href="{% url 'staff' data.name %}">{{ data.name }} </a> {{ data.surname }}/ Role: {{ data.role }}
+            <a href="{% url 'staff' data.name %}" style="color:red;">{{ data.name }} </a> {{ data.surname }}/ Role: {{ data.role }}
         {% else %}
             <p>Admin</p>
         {% endif %}

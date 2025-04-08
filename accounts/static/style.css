@@ -160,8 +160,10 @@ body {
 
 .staff_list p{
     font-size:30px;
-    font-weight:300;
+    font-weight:bold;
 }
+
+
 
 /* Graphs */
 .graph {
