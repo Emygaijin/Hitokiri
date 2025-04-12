@@ -12,25 +12,25 @@
             {% if info.photo %}
             <div class="image"><img src="{{ info.photo.url }}" alt="Pending"></div>
             {% else %}
-            <div class="image"><p>No Image selected</p></div>
+            <div class="image"><p style="font-weight:bold; color:white;">No Image selected</p></div>
             {% endif %}
         </div>
         <div class="content">
-            <p>NAME: {{ info.name }} {{ info.surname }}</p>
-            <p>DATE OF BIRTH: {{ info.date_of_birth }}</p>
-            <p>ROLE: {{ info.role }}</p>
-            <p>PHONE: {{ info.phone_number }}</p>
-            <p>{{ info.email }}</p>
-            <p>DATE JOINED: {{ info.date_joined }}</p>
+            <p style="font-weight:bold; color:white;">NAME: {{ info.name }} {{ info.surname }}</p>
+            <p style="font-weight:bold; color:white;">DATE OF BIRTH: {{ info.date_of_birth }}</p>
+            <p style="font-weight:bold; color:white;">ROLE: {{ info.role }}</p>
+            <p style="font-weight:bold; color:white;">PHONE: {{ info.phone_number }}</p>
+            <p style="font-weight:bold; color:white;">{{ info.email }}</p>
+            <p style="font-weight:bold; color:white;">DATE JOINED: {{ info.date_joined }}</p>
             {% if info.date_disengaged is none %}
-            <p>DATE DISENGAGED: ACTIVE </p>
+            <p style="font-weight:bold; color:white;">DATE DISENGAGED: ACTIVE </p>
             {% else %}
-            <p>DATE DISENGAGED: {{ info.date_disengaged }}</p>
+            <p style="font-weight:bold; color:white;">DATE DISENGAGED: {{ info.date_disengaged }}</p>
             {% endif %}
             {% if info.cv %}
             <p><a href="{{ info.cv.url }}" target="_blank">View CV</a></p>
         {% else %}
-            <p>No CV uploaded.</p>
+            <p style="font-weight:bold; color:white;">No CV uploaded.</p>
         {% endif %}
         </div>
     </div>

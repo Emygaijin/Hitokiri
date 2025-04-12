@@ -377,6 +377,8 @@ def query_records(request):
     total_sales = 0
     total_expenses = 0
     total_production = 0
+    total_stereo_used = 0
+    total_packaging_bags_used = 0
 
     if start_date and end_date:
         start_date = datetime.strptime(start_date, '%Y-%m-%d').date()
@@ -386,6 +388,9 @@ def query_records(request):
         total_sales = SalesRecord.objects.filter(date_of_sale__range=[start_date, end_date]).aggregate(Sum('total'))['total__sum'] or 0
         total_expenses = Finance.objects.filter(date_of_expense__range=[start_date, end_date]).aggregate(Sum('amount'))['amount__sum'] or 0
         total_production = OperationsRecord.objects.filter(date_produced__range=[start_date, end_date]).aggregate(Sum('bags_produced'))['bags_produced__sum'] or 0
+
+        total_stereo_used = OperationsRecord.objects.filter(date_produced__range=[start_date, end_date]).aggregate(Sum('stereo_used'))['stereo_used__sum'] or 0
+        total_packaging_bags_used = OperationsRecord.objects.filter(date_produced__range=[start_date, end_date]).aggregate(Sum('packaging_bags_used'))['packaging_bags_used__sum'] or 0
     else:
         start_date = end_date = None  # Avoid rendering "None to None" issue
 
@@ -393,6 +398,8 @@ def query_records(request):
         'total_sales': total_sales,
         'total_expenses': total_expenses,
         'total_production': total_production,
+        'total_stereo_used': total_stereo_used,
+        'total_packaging_bags_used': total_packaging_bags_used,
         'start_date': start_date,
         'end_date': end_date,
     }
