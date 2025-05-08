@@ -38,7 +38,9 @@ class CustomUser(AbstractUser):
         ('Cleaner', 'cleaner'),
         ('Motor boy', 'motor boy'),
         ('Security', 'security'),
-        ('Supervisor', 'supervisor')
+        ('Supervisor', 'supervisor'),
+        ('Operator', 'operator'),
+        ('Front desk', 'front desk'),
         # Add remaining roles...
     ]
     STATUS_CHOICES = [

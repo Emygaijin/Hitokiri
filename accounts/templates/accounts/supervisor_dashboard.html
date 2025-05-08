@@ -43,6 +43,38 @@
         </div>
     </div>
 
+     <!-- Operations Records -->
+    <div class="records">
+        <h3>Latest Operations Records</h3>
+        <div class="scrollable-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th>Date Produced</th>
+                        <th>Bags Produced</th>
+                        <th>To Sales</th>
+                        <th>Returned</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in operations_records %}
+                    <tr>
+                        <td>{{ record.date_produced }}</td>
+                        <td>{{ record.bags_produced }}</td>
+                        <td>{{ record.bags_pushed_to_sales }}</td>
+                        <td>{{ record.bags_returned }}</td>
+                    </tr>
+                    {% empty %}
+                    <tr>
+                        <td colspan="4">No operations records available.</td>
+                    </tr>
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
     <!-- Sales Record -->
        <div>
 
