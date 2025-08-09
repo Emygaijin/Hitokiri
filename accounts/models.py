@@ -1,6 +1,7 @@
 from django.contrib.auth.models import AbstractUser, BaseUserManager
 from django.db import models
 from django.utils.timezone import now
+from decimal import Decimal, ROUND_HALF_UP
 
 
 class CustomUserManager(BaseUserManager):
@@ -31,7 +32,10 @@ class CustomUserManager(BaseUserManager):
 class CustomUser(AbstractUser):
     ROLE_CHOICES = [
         ('Finance', 'finance'),
+        ('Sales Manager', 'Sales Manager'),
+
         ('Operations Manager', 'Operations Manager'),
+        ('Production Supervisor', 'Production Supervisor'),
         ('Sales', 'sales'),
         ('Driver', 'driver'),
         ('Bagger', 'bagger'),
@@ -41,6 +45,8 @@ class CustomUser(AbstractUser):
         ('Supervisor', 'supervisor'),
         ('Operator', 'operator'),
         ('Front desk', 'front desk'),
+        ('Store keeper', 'store keeper'),
+        ('Boss', 'boss'),
         # Add remaining roles...
     ]
     STATUS_CHOICES = [
@@ -70,33 +76,66 @@ class CustomUser(AbstractUser):
 class OperationsRecord(models.Model):
     bags_produced = models.PositiveIntegerField(blank=True, null=True)
     date_produced = models.DateField(default=now, editable=False, blank=True, null=True)
-    bags_returned = models.PositiveIntegerField(default=0, blank=True, null=True)
-    bags_pushed_to_sales = models.PositiveIntegerField(default=0, blank=True,null=True)
     stereo_received = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
     stereo_used = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
     packaging_bags = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
+    cone = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
     packaging_bags_used = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
+    diesel_received = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
+    diesel_used = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
     bad_stereo = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
+    stereo_yield = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
     comments = models.TextField(blank=True, max_length=2035)
 
+    def calculate_yield(self):
+        if self.stereo_used and self.stereo_used != 0:
+            bags = Decimal(self.bags_produced or 0)
+            stereo_used = Decimal(self.stereo_used or 0)
+            if stereo_used > 0:
+                return (bags / stereo_used).quantize(Decimal('0.00'), rounding=ROUND_HALF_UP)
+        return Decimal('0.00')
 
-    class Meta:
-        constraints = [
-            models.CheckConstraint(
-                check=models.Q(bags_pushed_to_sales__lte=models.F('bags_produced')),
-                name='bags_pushed_to_sales_lte_bags_produced'
-            ),
-        ]
+    def save(self, *args, **kwargs):
+        # Automatically calculate the total before saving
+        self.stereo_yield = self.calculate_yield()
+        super().save(*args, **kwargs)
 
     def __str__(self):
         return f"Record for {self.date_produced} - Bags Produced: {self.bags_produced}"
 
 
+
+
+
+class SpecialSale(models.Model):
+    bags_sold = models.PositiveIntegerField(blank=True, null=True)
+    date_of_sale = models.DateField(default=now, editable=False)
+    applied_discount = models.PositiveIntegerField(default=0, blank=True, null=True)
+    keystone = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
+    zenith = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
+    moniepoint = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
+    cash = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
+    total = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
+    comments = models.TextField(blank=True, max_length=2035)
+
+    def calc(self):
+        # Ensure none of the fields are None before calculating
+        return (self.keystone or 0) + (self.moniepoint or 0) + (self.zenith or 0) + self.cash
+
+    def save(self, *args, **kwargs):
+        # Automatically calculate the total before saving
+        self.total = self.calc()
+        super().save(*args, **kwargs)
+
+
 class SalesRecord(models.Model):
-    bags_received_from_production = models.PositiveIntegerField(default=0)
     applied_discount = models.PositiveIntegerField(default=0)
     bags_sold = models.PositiveIntegerField()
-    bags_returned = models.PositiveIntegerField(default=0)
+    to_umuahia = models.PositiveIntegerField(null=True, blank=True, default=0)
+    law_enforcement = models.PositiveIntegerField(null=True, blank=True, default=0)
+    rebagged = models.PositiveIntegerField(null=True, blank=True, default=0)
+    lost_to_rebagging = models.PositiveIntegerField(null=True, blank=True, default=0)
+    damaged = models.PositiveIntegerField(null=True, blank=True, default=0)
     date_of_sale = models.DateField(default=now, editable=False)
     keystone = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
     zenith = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True, default=0)
@@ -118,8 +157,25 @@ class SalesRecord(models.Model):
         return f"Sales on {self.date_of_sale}: Sold - {self.bags_sold}, Returned - {self.bags_returned}"
 
 
+
 class Finance(models.Model):
-    expense_title = models.CharField(max_length=100, blank=True)
+    EXPENSE_CHOICES = [
+        ('Fuel','fuel'),
+        ('Diesel','diesel'),
+        ('Vehicle repairs','vehicle_repairs'),
+        ('Packaging bags', 'packaging_bags'),
+        ('Stereo','stereo'),
+        ('Fuel deposit', 'fuel deposit'),
+        ('Audit fee', 'audit fee'),
+        ('Generator repairs', 'generator repairs'),
+        ('Imprest account', 'imprest account'),
+        ('Waybill', 'waybill'),
+        ('Others', 'others'),
+
+    ]
+
+    expense_type = models.CharField(max_length=50, choices=EXPENSE_CHOICES, blank=True, null=True)
+    custom_expense_name = models.CharField(max_length=100, blank=True, null=True)
     amount = models.DecimalField(max_digits=10, decimal_places=2, null=True, blank=True)
     date_of_expense = models.DateField(default=now, editable=False, blank=True, null=True)
     receipt = models.FileField(upload_to='expenses_receipts/', blank=True, null=True)

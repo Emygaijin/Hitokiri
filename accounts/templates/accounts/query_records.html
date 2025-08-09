@@ -33,11 +33,23 @@
     <p style="font-weight:bold;">{{ total_production }}</p>
 
     <h4>Total Stereo Used:</h4>
-    <p style="font-weight:bold;">{{ total_stereo_used }}Kg</p>
+    <p style="font-weight:bold;">{{ total_stereo_used|floatformat:2 }}Kg</p>
 
     <h4>Total Packaging Bags used:</h4>
     <p style="font-weight:bold;">{{ total_packaging_bags_used }}</p>
 
+    <h4>Total Diesel Used:</h4>
+     <p style="font-weight:bold;">{{ total_diesel_used }}</p>
+
+
+
+    <h4>Total Cost of Production: ₦{{ total_production_cost  }}</h4>
+    <p style="font-weight:bold;">Production Cost per Bag: ₦{{ production_cost_per_bag }}</p>
+
+
+
 </div>
+
+
 
 {% endblock %}

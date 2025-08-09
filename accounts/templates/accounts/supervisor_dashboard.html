@@ -11,26 +11,39 @@
     <table>
 
         <p style="font-weight:bold;">Total Staff: {{ total_staff }}</p>
-        <p style="font-weight:bold;">Total Sales (Bags Sold): {{ total_sales }}</p>
-        <p style="font-weight:bold;">Total Bags Produced: {{ total_bags_produced }}</p>
-        <p style="font-weight:bold;">Total Sales: {{ grand_total }}</p>
+        <p style="font-weight:bold;">Total Bags Produced : {{ total_bags_produced }} Bags</p>
+        <p style="font-weight:bold;">Available stock : {{ available_stock }} Bags</p>
+        <p style="font-weight:bold;">Total sales : {{ total_bags_sold }} Bags : ₦{{ overall_total }}</p>
+<!--        <p style="font-weight:bold;">Total Sales Isuikwuato - {{ total_isuikwuato }} Bags : {{ cash_isuikwuato }}</p>-->
         <p style="font-weight:bold;">Total expenses: {{ total_expenses }}</p>
-        <p style="font-weight:bold;">Net: {{ net }}</p>
-        <p style="font-weight:bold;">Average Daily sales: {{ average_sales }}</p>
+        <p style="font-weight:bold;">Net Profit (₦): {{ net }}</p>
+        <p style="font-weight:bold;"><strong>Total Diesel Used (Litres):</strong> {{ diesel_used_qty }}</p>
+        <p style="font-weight:bold;"><strong >Total Diesel Received (Litres):</strong> {{ diesel_received_qty }}</p>
+        <p style="font-weight:bold;"><strong>Total Diesel Expense (₦):</strong> ₦{{ total_diesel_expense }}</p>
+        <p style="font-weight:bold;"><strong>Total Fuel Expense (₦):</strong> ₦{{ total_fuel_expense }}</p>
+
+        {% if available_diesel < lower_diesel_limit %}
+            <p style="background-color:red; color:white; font-weight:bold;">DIESEL LOW {{ available_diesel }}Ltrs remaining</p>
+        {% else %}
+            <p style="font-weight:bold;">Available Diesel: {{ available_diesel }}Kg</p>
+        {% endif %}
+
 
         {% if available_stereo < lower_stereo_limit %}
-            <p style="background-color:red; color:white; font-weight:bold;">Restock stereo {{ available_stereo }}Kg remaining</p>
+            <p style="background-color:red; color:white; font-weight:bold;">Restock stereo {{ available_stereo|floatformat:2 }}Kg remaining</p>
         {% else %}
-            <p style="font-weight:bold;">Available stereo: {{ available_stereo }}Kg</p>
+            <p style="font-weight:bold;">Available stereo: {{ available_stereo|floatformat:2 }}Kg</p>
         {% endif %}
+        <p style="font-weight:bold;"><strong>Total cone weight (kg):</strong> {{ total_cone|floatformat:2 }}</p>
 
         {% if available_packaging_bags < lower_packaging_bags_limit %}
             <p style="background-color:red; color:white; font-weight:bold;">Restock packaging bags {{ available_packaging_bags }} remaining</p>
         {% else %}
-            <p>Available packaging bags: {{ available_packaging_bags }}</p>
+            <p style="font-weight:bold;">Available packaging bags: {{ available_packaging_bags }}</p>
         {% endif %}
 
-        <p ><a href="{% url 'query_records' %}" class="btn" style="font-weight:bold;">Go to Query Page</a></p>
+        <p ><a href="{% url 'query_records' %}" class="btn" style="font-weight:bold;"> Query Operations</a></p>
+         <a href="{% url 'query_expenses' %}" class="btn" style="font-weight:bold;">Query Expenses</a>
     </table>
 </div>
 
@@ -43,31 +56,33 @@
         </div>
     </div>
 
-     <!-- Operations Records -->
+     <!-- Production Records -->
     <div class="records">
-        <h3>Latest Operations Records</h3>
+        <h3>Latest Production Records</h3>
         <div class="scrollable-container">
             <table>
                 <thead>
                     <tr>
-                        <th>Date Produced</th>
-                        <th>Bags Produced</th>
-                        <th>To Sales</th>
-                        <th>Returned</th>
+                        <th style="font-weight:bold;">Date Produced</th>
+                        <th style="font-weight:bold;">Bags Produced</th>
+                        <th style="font-weight:bold;">Stereo Used</th>
+                        <th style="font-weight:bold;">Yield</th>
+                        <th style="font-weight:bold;">Diesel used</th>
                     </tr>
                 </thead>
                 <tbody>
                     {% for record in operations_records %}
                     <tr>
-                        <td>{{ record.date_produced }}</td>
-                        <td>{{ record.bags_produced }}</td>
-                        <td>{{ record.bags_pushed_to_sales }}</td>
-                        <td>{{ record.bags_returned }}</td>
+                        <td ><a href="{% url 'edit_operations_record' record.pk %}" style="font-weight:bold;">{{ record.date_produced }}</a></td>
+                        <td style="font-weight:bold;">{{ record.bags_produced }}</td>
+                        <td style="font-weight:bold;"> {{ record.stereo_used }} </td>
+                        <td style="font-weight:bold;">{{ record.stereo_yield}}</td>
+                        <td style="font-weight:bold;">{{ record.diesel_used }}</td>
                     </tr>
                     {% empty %}
-                    <tr>
-                        <td colspan="4">No operations records available.</td>
-                    </tr>
+<!--                    <tr>-->
+<!--                        <td colspan="4">No operations records available.</td>-->
+<!--                    </tr>-->
                     {% endfor %}
                 </tbody>
             </table>
@@ -76,96 +91,105 @@
 
 
     <!-- Sales Record -->
-       <div>
+    <div>
+        <h3>Latest Sales Records</h3>
+        <div class="scrollable-container">
+            <table>
+                <thead>
+                    <tr>
+                        <th style="font-weight:bold;">Date of Sale</th>
+                        <th style="font-weight:bold;">Bags Sold</th>
+                        <th style="font-weight:bold;">Discount</th>
+                        <th style="font-weight:bold;">To Umuahia</th>
+                        <th style="font-weight:bold;">Law enforcement</th>
+                        <th style="font-weight:bold;">Rebagged</th>
+                        <th style="font-weight:bold;">Lost to rebagging</th>
+                        <th style="font-weight:bold;">Damaged</th>
+                        <th style="font-weight:bold;">Keystone</th>
+                        <th style="font-weight:bold;">Moniepoint</th>
+                        <th style="font-weight:bold;">Zenith</th>
+                        <th style="font-weight:bold;">Cash</th>
+                        <th style="font-weight:bold;">Total</th>
+                        <th style="font-weight:bold;">Discrepancy</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    {% for record in sales_records %}
+                    {% if record.expected_total != record.total %}
+                    <tr style="background-color: red; color: white; font-weight: bold;">
+                        <td><a href="{% url 'edit_sales_record' record.pk %}" style="font-weight:bold;">{{ record.date_of_sale }}</a></td>
+                        <td style="font-weight:bold;">{{ record.bags_sold }}</td>
+                        <td style="font-weight:bold;">{{ record.applied_discount }}</td>
+                        <td style="font-weight:bold;">{{ record.to_umuahia }}</td>
+                        <td style="font-weight:bold;">{{ record.law_enforcement }}</td>
+                        <td style="font-weight:bold;">{{ record.rebagged }}</td>
+                        <td style="font-weight:bold;">{{ record.lost_to_rebagging }}</td>
+                        <td style="font-weight:bold;">{{ record.damaged }}</td>
 
-    <div class="scrollable-container">
-        <table>
-            <thead>
-            <tr><h3>Latest Sales Records</h3></tr>
-                <tr>
-                    <th>Date of Sale</th>
-                    <th>From Production</th>
-                    <th>Discount</th>
-                    <th>Bags Sold</th>
-                    <th>Returned</th>
-                    <th>Keystone</th>
-                    <th>Moniepoint</th>
-                    <th>Zenith</th>
-                    <th>Cash</th>
-                    <th>Total</th>
-                    <th>Discrepancy</th>
-                </tr>
-            </thead>
-            <tbody>
-                {% for record in sales_records %}
-                {% if record.expected_total != record.total %}
-                <tr style="background-color: red; color: white; font-weight: bold;">
-                    <td>{{ record.date_of_sale }}</td>
-                    <td>{{ record.bags_received_from_production }}</td>
-                    <td>{{ record.applied_discount }}</td>
-                    <td>{{ record.bags_sold }}</td>
-                    <td>{{ record.bags_returned }}</td>
-                    <td>{{ record.keystone}}</td>
-                    <td>{{ record.moniepoint }}</td>
-                    <td>{{ record.zenith }}</td>
-                    <td>{{ record.cash }} </td>
-                   <td style="background-color: red; color: white; font-weight: bold;">
-                    {{ record.total }}
-                    </td>
-                    <td >
-                    <h4>CHECK</h4>
-                    </td>
-                </tr>
+                        <td style="font-weight:bold;">{{ record.keystone}}</td>
+                        <td style="font-weight:bold;">{{ record.moniepoint }}</td>
+                        <td style="font-weight:bold;">{{ record.zenith }}</td>
+                        <td style="font-weight:bold;">{{ record.cash }} </td>
+                        <td style="font-weight:bold;">{{ record.total }} </td>
+                        <td style="background-color: red; color: white; font-weight: bold;">
+                        <h4>CHECK</h4>
+                        </td>
 
-                <tr>
-                    <td colspan="11">No sales records available.</td>
-                </tr>
-                {% else %}
-                   <tr>
-                    <td>{{ record.date_of_sale }}</td>
-                    <td>{{ record.bags_received_from_production }}</td>
-                    <td>{{ record.applied_discount }}</td>
-                    <td>{{ record.bags_sold }}</td>
-                    <td>{{ record.bags_returned }}</td>
-                    <td>{{ record.keystone}}</td>
-                    <td>{{ record.moniepoint }}</td>
-                    <td>{{ record.zenith }}</td>
-                    <td>{{ record.cash }} </td>
-                   <td>
-                    {{ record.total }}
-                    </td>
-                    <td>
-                    <h4>NONE</h4>
-                    </td>
-                </tr>
-                {% endif %}
-                {% endfor %}
-            </tbody>
-        </table>
-    </div>
-</div>
+
+                    </tr>
+                    {% else %}
+                    <tr>
+                       <td><a href="{% url 'edit_sales_record' record.pk %}" style="font-weight:bold;">{{ record.date_of_sale }}</a></td>
+                        <td style="font-weight:bold;">{{ record.bags_sold }}</td>
+                        <td style="font-weight:bold;">{{ record.applied_discount }}</td>
+                        <td style="font-weight:bold;">{{ record.to_umuahia }}</td>
+                        <td style="font-weight:bold;">{{ record.law_enforcement }}</td>
+                        <td style="font-weight:bold;">{{ record.rebagged }}</td>
+                        <td style="font-weight:bold;">{{ record.lost_to_rebagging }}</td>
+                        <td style="font-weight:bold;">{{ record.damaged }}</td>
+
+                        <td style="font-weight:bold;">{{ record.keystone}}</td>
+                        <td style="font-weight:bold;">{{ record.moniepoint }}</td>
+                        <td style="font-weight:bold;">{{ record.zenith }}</td>
+                        <td style="font-weight:bold;">{{ record.cash }} </td>
+                        <td style="font-weight:bold;">{{ record.total }} </td>
+                        <td style="font-weight:bold;">
+                        <h4>OKAY</h4>
+                        </td>
+
+
+                    </tr>
+                    {% endif %}
+<!--                    <tr>-->
+<!--                        <td colspan="10">No sales records available.</td>-->
+<!--                    </tr>-->
+                    {% endfor %}
+                </tbody>
+            </table>
+        </div>
+
 
 <h3>Latest Expenses Records</h3>
 <div class="scrollable-container">
     <table>
         <thead>
             <tr>
-                <th>Date</th>
-                <th>Title</th>
-                <th>Amount</th>
+                <th style="font-weight:bold;">Date</th>
+                <th style="font-weight:bold;">Title</th>
+                <th style="font-weight:bold;">Amount</th>
             </tr>
         </thead>
         <tbody>
             {% for record in finance_records %}
             <tr>
-                <td>{{ record.date_of_expense }}</td>
-                <td>{{ record.expense_title }}</td>
-                <td>{{ record.amount }}</td>
+                <td style=><a href="{% url 'edit_finance_record' record.pk %}" style="font-weight:bold;">{{ record.date_of_expense }}</a></td>
+                <td style="font-weight:bold;">{{ record.expense_type }}</td>
+                <td style="font-weight:bold;">{{ record.amount }}</td>
             </tr>
             {% empty %}
-            <tr>
-                <td colspan="3">No Expenses records available.</td>
-            </tr>
+<!--            <tr>-->
+<!--                <td colspan="3" style="font-weight:bold;">No Expenses records available.</td>-->
+<!--            </tr>-->
             {% endfor %}
         </tbody>
     </table>
@@ -188,8 +212,8 @@
                     <tbody>
 
                         <tr>
-                            <td>{{ record.date_of_expense }}</td>
-                            <td>{{ record.comments }}</td>
+                            <td style="font-weight:bold;">{{ record.date_of_expense }}</td>
+                            <td style="font-weight:bold;">{{ record.comments }}</td>
 
                         </tr>
 
@@ -205,19 +229,19 @@
                             <th>Comment</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="2">No Comments available.</td>
-                        </tr>
+<!--                    <tbody>-->
+<!--                        <tr>-->
+<!--                            <td colspan="2" style="font-weight:bold;">No Comments available.</td>-->
+<!--                        </tr>-->
 
-                    </tbody>
+<!--                    </tbody>-->
                 </table>
                 {% endif %}
                 {% endfor %}
              </div>
 
              <div class="scrollable-container">
-                <h2>Operations comments</h2>
+                <h2>Production comments</h2>
                  {% for record in operations_records %}
                 {% if record.comments %}
                 <table>
@@ -231,8 +255,8 @@
                     <tbody>
 
                         <tr>
-                            <td>{{ record.date_produced }}</td>
-                            <td>{{ record.comments }}</td>
+                            <td style="font-weight:bold;">{{ record.date_produced }}</td>
+                            <td style="font-weight:bold;">{{ record.comments }}</td>
 
                         </tr>
 
@@ -248,12 +272,12 @@
                             <th>Comment</th>
                         </tr>
                     </thead>
-                    <tbody>
-                        <tr>
-                            <td colspan="2">No Comments available.</td>
-                        </tr>
+<!--                    <tbody>-->
+<!--                        <tr>-->
+<!--                            <td colspan="2" style="font-weight:bold;">No Comments available.</td>-->
+<!--                        </tr>-->
 
-                    </tbody>
+<!--                    </tbody>-->
                 </table>
                 {% endif %}
                  {% endfor %}
@@ -273,8 +297,8 @@
                     <tbody>
 
                         <tr>
-                            <td>{{ record.date_of_sale }}</td>
-                            <td>{{ record.comments }}</td>
+                            <td style="font-weight:bold;">{{ record.date_of_sale }}</td>
+                            <td style="font-weight:bold;">{{ record.comments }}</td>
 
                         </tr>
 
@@ -295,6 +319,7 @@
         {% endif %}
     </p>
     {% endfor %}
+
 </div>
 
 </div>
@@ -330,4 +355,5 @@
     document.onscroll = resetTimer;
     document.onclick = resetTimer;
 </script>
+    </div>
 {% endblock %}

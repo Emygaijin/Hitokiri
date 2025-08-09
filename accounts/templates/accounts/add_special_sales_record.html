@@ -1,11 +1,11 @@
 {% extends 'base.html' %}
 {% load static %}
-{% block title %}  Sales records {% endblock %}
+{% block title %} Special Sales records {% endblock %}
 {% load crispy_forms_tags %}
 {% block content %}
 
 <div class="bod">
-    <h1>Add Sales Record</h1>
+    <h1>Add  Special Sales Record</h1>
           <form method="post">
             {% csrf_token %}
             {{ form|crispy }}

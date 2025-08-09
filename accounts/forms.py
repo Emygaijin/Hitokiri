@@ -1,5 +1,5 @@
 from django import forms
-from .models import CustomUser, OperationsRecord, SalesRecord, Finance
+from .models import CustomUser, OperationsRecord, SalesRecord, Finance,  SpecialSale
 
 
 class RegistrationForm(forms.ModelForm):
@@ -20,21 +20,26 @@ class RegistrationForm(forms.ModelForm):
 class BagsForm(forms.ModelForm):
     class Meta:
         model = OperationsRecord
-        fields = ['bags_produced', 'bags_returned', 'bags_pushed_to_sales', 'stereo_received', 'bad_stereo', 'stereo_used',
-                  'packaging_bags', 'packaging_bags_used','comments']
+        fields = ['bags_produced', 'stereo_received', 'bad_stereo', 'stereo_used','cone',
+                  'packaging_bags', 'packaging_bags_used','comments','diesel_received', 'diesel_used']
 
 
 
 class ExpenseForm(forms.ModelForm):
     class Meta:
         model = Finance
-        fields = ['expense_title', 'amount', 'receipt', 'comments']
+        fields = ['expense_type','custom_expense_name', 'amount', 'receipt', 'comments']
 
 
 
 class SalesForm(forms.ModelForm):
     class Meta:
         model = SalesRecord
-        fields = ['bags_sold', 'bags_returned', 'bags_received_from_production','applied_discount', 'keystone', 'zenith', 'moniepoint', 'cash', 'comments']
+        fields = ['bags_sold','applied_discount', 'keystone', 'zenith', 'moniepoint', 'cash','to_umuahia', 'law_enforcement','rebagged','lost_to_rebagging', 'damaged', 'comments']
 
 
+
+class SpecialSaleForm(forms.ModelForm):
+    class Meta:
+        model = SpecialSale
+        fields = ['bags_sold', 'keystone','applied_discount', 'zenith', 'moniepoint', 'cash', 'comments']

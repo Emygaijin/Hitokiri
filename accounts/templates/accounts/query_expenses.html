@@ -1,0 +1,56 @@
+{% extends 'base.html' %}
+{% block title %} Query Records {% endblock %}
+{% block content %}
+
+<div class="bod">
+
+<form method="get" class="mb-4">
+    <label>Start Date:</label>
+    <input type="date" name="start_date" value="{{ start_date }}">
+    <label>End Date:</label>
+    <input type="date" name="end_date" value="{{ end_date }}">
+    <button type="submit">Search</button>
+</form>
+
+{% if expense_summary %}
+    <h3>Expense Summary ({{ start_date }} to {{ end_date }})</h3>
+    <ul>
+        {% for item in expense_summary %}
+            <li>
+                <a href="?start_date={{ start_date }}&end_date={{ end_date }}&expense_type={{ item.expense_type }}" style="font-weight:bold;">
+                    {{ item.expense_type|title }} - ₦{{ item.total_amount }}
+                </a>
+            </li>
+        {% endfor %}
+    </ul>
+    <p style="font-weight:bold;"><strong>Total:</strong> ₦{{ total_sum }}</p>
+{% endif %}
+
+{% if expense_details %}
+    <h4>Details for "{{ selected_expense|title }}"</h4>
+    <table border="1">
+        <thead>
+            <tr>
+                <th>Date</th>
+                <th>Amount</th>
+                <th>Custom Name</th>
+                <th>Comments</th>
+            </tr>
+        </thead>
+        <tbody>
+            {% for record in expense_details %}
+                <tr>
+                    <td style="font-weight:bold;">{{ record.date_of_expense }}</td>
+                    <td style="font-weight:bold;">₦{{ record.amount }}</td>
+                    <td style="font-weight:bold;">{{ record.custom_expense_name }}</td>
+                    <td style="font-weight:bold;">{{ record.comments }}</td>
+                </tr>
+            {% endfor %}
+        </tbody>
+    </table>
+{% endif %}
+
+
+</div>
+
+{% endblock %}

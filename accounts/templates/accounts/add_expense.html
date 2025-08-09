@@ -7,12 +7,22 @@
 
 <div class="bod">
     <h2>Add Expense Data</h2>
-    <form method="post" enctype="multipart/form-data">
+   <form method="post" enctype="multipart/form-data">
     {% csrf_token %}
-    {{ form|crispy }}
-        <h3 class="warning" style="font-weight:bold;">PLEASE ENSURE THE INFORMATION IS CORRECT BEFORE POSTING THE DATA </h3>
+    {{ form.expense_type|as_crispy_field }}
+
+    <div id="custom-expense-field" style="display: none;">
+        {{ form.custom_expense_name|as_crispy_field }}
+    </div>
+
+    {{ form.amount|as_crispy_field }}
+
+
+    <h3 class="warning" style="font-weight:bold;">
+        PLEASE ENSURE THE INFORMATION IS CORRECT BEFORE POSTING THE DATA
+    </h3>
     <button type="submit" class="btn-success">Submit</button>
-    </form>
+</form>
     <a href="{% url 'finance' %}" style="color:red; font-weight:bold;">Back to Dashboard</a>
 </div>
 <script>
@@ -33,6 +43,25 @@
     document.onkeypress = resetTimer;
     document.onscroll = resetTimer;
     document.onclick = resetTimer;
+</script>
+<script>
+    function toggleCustomField(value) {
+        const customField = document.getElementById('custom-expense-field');
+        if (value === 'Other') {
+            customField.style.display = 'block';
+        } else {
+            customField.style.display = 'none';
+            document.querySelector('#id_custom_expense_name').value = '';
+        }
+    }
+
+    document.addEventListener('DOMContentLoaded', function () {
+        const expenseTypeSelect = document.querySelector('#id_expense_type');
+        toggleCustomField(expenseTypeSelect.value);  // Initialize on load
+        expenseTypeSelect.addEventListener('change', function () {
+            toggleCustomField(this.value);
+        });
+    });
 </script>
 
 {% endblock %}

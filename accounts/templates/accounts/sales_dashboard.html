@@ -10,7 +10,7 @@
                 <tr>
                     <th>Date of Sale</th>
                     <th>Bags Sold</th>
-                    <th>Bags Returned</th>
+                    <th>Discount Applied</th>
                     <th>Moniepoint</th>
                     <th>Keystone</th>
                     <th>Cash</th>
@@ -22,7 +22,7 @@
                 <tr>
                     <td>{{ record.date_of_sale }}</td>
                     <td>{{ record.bags_sold }}</td>
-                    <td>{{ record.bags_returned }}</td>
+                    <td>{{ record.discount_applied}}</td>
                     <td>{{ record.moniepoint }}</td>
                     <td>{{ record.keystone }}</td>
                     <td>{{ record.zenith }}</td>
@@ -34,6 +34,7 @@
     </div>
 
         <a href="{% url 'add_sales_record' %}" style="color:red; font-weight:bold;">Add Sales Record</a>
+
 </div>
 
 <script>
